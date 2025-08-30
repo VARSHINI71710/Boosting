@@ -5,34 +5,35 @@ import pickle
 # Load the trained model & scaler (if you saved both together)
 model, scaler = pickle.load(open("trained_model.sav", "rb"))
 
-# Streamlit app
-st.title("💳 Credit Card Default Prediction App")
-st.write("This app predicts whether a customer will default on their credit card payment next month.")
 
-# Collect user inputs for the 8 important features
-limit_bal = st.number_input("Credit Limit (LIMIT_BAL)", min_value=0, value=50000, step=1000)
-pay_0 = st.number_input("Payment Status (PAY_0)", min_value=-2, max_value=8, value=0)
-pay_2 = st.number_input("Payment Status (PAY_2)", min_value=-2, max_value=8, value=0)
-bill_amt1 = st.number_input("Bill Amount (BILL_AMT1)", min_value=0, value=10000, step=1000)
-pay_amt1 = st.number_input("Previous Payment Amount (PAY_AMT1)", min_value=0, value=5000, step=1000)
-pay_amt2 = st.number_input("Payment Amount (PAY_AMT2)", min_value=0, value=5000, step=1000)
-pay_amt3 = st.number_input("Payment Amount (PAY_AMT3)", min_value=0, value=5000, step=1000)
-marriage = st.selectbox(
-    "Marital Status (MARRIAGE)",
-    options=[1, 2, 3],
-    format_func=lambda x: {1: "Married", 2: "Single", 3: "Others"}[x]
-)
+st.title("💳 Credit Card Default Prediction")
 
-# Prepare input for model (order must match training dataset columns)
-# Make sure the order here is SAME as the 'selected_columns' you trained with
-features = np.array([[pay_0, pay_amt2, limit_bal, pay_2, pay_amt3, bill_amt1, pay_amt1, marriage]])
+st.markdown("Enter customer details to predict if they will default next month:")
 
 
+PAY_0 = st.number_input("Payment Status PAY_0", min_value=-2, max_value=8, value=0)
+PAY_AMT2 = st.number_input("Previous Payment PAY_AMT2", min_value=0, value=5000)
+LIMIT_BAL = st.number_input("Credit Limit (LIMIT_BAL)", min_value=1000, value=50000)
+PAY_2 = st.number_input("Payment Status PAY_2", min_value=-2, max_value=8, value=0)
+PAY_AMT3 = st.number_input("Payment Amount PAY_AMT3", min_value=0, value=5000)
+BILL_AMT1 = st.number_input("Bill Amount BILL_AMT1", min_value=0, value=10000)
+PAY_AMT1 = st.number_input("Previous Payment PAY_AMT1", min_value=0, value=5000)
+MARRIAGE = st.selectbox("Marital Status", ["Married", "Single", "Others"])
+MARRIAGE_val = 1 if MARRIAGE == "Married" else 2 if MARRIAGE == "Single" else 3
 
-# Predict button
-if st.button("🔍 Predict"):
-    prediction = model.predict(features)
-    if prediction[0] == 1:
-        st.error("⚠️ The customer is likely to DEFAULT next month.")
-    else:
-        st.success("✅ The customer is NOT likely to default next month.")
+
+if st.button("Predict"):
+    
+    input_array = np.array([PAY_0, PAY_AMT2, LIMIT_BAL, PAY_2, PAY_AMT3, BILL_AMT1, PAY_AMT1, MARRIAGE_val]).reshape(1, -1)
+    
+    
+    input_scaled = scaler.transform(input_array)
+    
+    
+    prediction = model.predict(input_scaled)[0]
+    proba = model.predict_proba(input_scaled)[0][1]
+    
+    
+    st.subheader("Prediction Result:")
+    st.write("🔹 Default" if prediction == 1 else "🔹 No Default")
+    st.write(f"🔹 Probability of Default: {proba:.2f}")
