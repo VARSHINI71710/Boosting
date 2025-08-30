@@ -14,14 +14,23 @@ The following 8 features are used for prediction:
 
 Feature	Description
 PAY_0	Payment status for the current month 💵
+
 PAY_AMT2	Payment made two months ago 📅
+
 LIMIT_BAL	Credit limit of the customer 💳
+
 PAY_2	Payment status two months ago 📅
+
 PAY_AMT3	Payment made three months ago 💰
+
 BILL_AMT1	Bill amount for the current month 🧾
+
 PAY_AMT1	Payment made one month ago 💵
+
 MARRIAGE	Marital status 👪 (1=Married, 2=Single, 3=Others)
+
 ✅ What I Have Done
+
 1️⃣ Data Preparation
 
 Loaded the dataset and renamed the target column default.payment.next.month to default. ✏️
